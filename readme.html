@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Notifier Trace for Zen Cart 1.3.9, 1.5.0, 1.5.1, 1.5.2</title>
+
+<style type="text/css">
+<!--
+A, A:active, A:visited {
+    color: #006666;
+    text-decoration: none
+}
+A:hover {
+    color:#00CC99;
+    text-decoration: underline;
+}
+BODY, P, H1, H2, H3, H4, H5, H6, LI, TD, DD, DT, table {
+  font-family: Verdana, AvantGarde, Tahoma, Arial, sans-serif;
+  font-size: 10pt;
+  color: black;
+  padding: 0px;
+  margin: 20px;
+}
+H1, H2, H3, H4 {
+  font-weight: bold
+}
+h1 {
+  font-size: 20px;
+}
+h2 {
+  font-size: 16px;
+  border-top: 1px solid #414141;
+}
+code {
+  padding-left: 25px;
+}
+ol li {
+  margin-left: 0;
+}
+ol li ol li, ul li ul li, ul li, ol li {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+code.nopad { padding: 0; }
+.corefile { color: red; }
+td, th { padding: 3px 5px; }
+td:first-child, th:first-child { text-align: center; }
+-->
+</style>
+</head>
+
+<body>
+<a name="top" id="top"></a>
+<h1>Notifier Trace for Zen Cart 1.3.9, 1.5.0, 1.5.1, 1.5.2</h1>
+<h3>Version 2.0.0 by lat9</h3>
+<p>Current Support Thread at Zen Cart Forums: <a href="http://www.zen-cart.com/forum/showthread.php?t=155383">http://www.zen-cart.com/forum/showthread.php?t=155383</a></p>
+
+<h2>Version History:</h2>
+<ul>
+  <li>v1.0.0, 2010-05-19, Initial release.</li>
+  <li>v1.0.1, 2010-10-21, Bug: For v1.3.9 users, the notifier trace was generated only for carts that had one or more observers attached.</li>
+  <li>v1.1.0, 2012-09-21:<ul>
+    <li>Add support for Zen Cart v1.5.1.</li>
+    <li>Remove support for v1.3.8a.</li>
+    <li>Renamed base_trace class file; the base class hasn't changed since v1.3.9</li>
+  </ul></li>
+  <li>v1.2.0, 2013-12-03, Added support for Zen Cart v1.5.2.  The class.base_trace.php file has been updated to the class.base.php file from Zen Cart v1.5.2 for <em>all</em> installations of this plugin.</li>
+  <li>v2.0.0, 2012-12-27, <b>Major restructuring</b>, with a single installation for <em>all</em> supported Zen Cart versions.</li>
+</ul>
+
+<h2>What it does</h2>
+<p>This plugin captures the output of each base-class notifier call &mdash; along with the date, time and main_page &mdash; and saves the information to a file (either /logs/notifier_trace.log for Zen Cart versions v1.5.1 and later or /cache/notifier_trace.log for previous versions) for later inspection. Each line of the file is formatted as:<br /><br />
+<code>
+yyyy-mm-dd hh:mm:ss [main_page=<i>page name</i>] <i>Notification text</i>
+</code><br /><br />
+The trace output is controlled by two configuration settings, one for store-side tracing and one for admin-side tracing, available in your admin's <em>Configuration-&gt;Logging</em> once you have applied the SQL patch present in /zen_trace_install.sql:</p>
+<ol>
+  <li><b>Enable the notifier-trace for your store?</b></li>
+  <li><b>Enable the notifier-trace for your admin?</b></li>
+</ol>
+<p>Each of these settings can be set to a variety of values, allowing you to control the scope of the trace output for each &quot;environment&quot;:</p>
+<table>
+  <tr>
+    <th>Setting the value to:</th>
+    <th>Causes the trace to be &hellip; </th>
+  </tr>
+  <tr>
+    <td><em>blank</em></td>
+    <td>&hellip; totally disabled.</td>
+  </tr>
+  <tr>
+    <td>*</td>
+    <td>&hellip; enabled for all accesses.</td>
+  </tr>
+  <tr>
+    <td>An IP address (either IPv4 or IPv6)</td>
+    <td>&hellip; limited to accesses made by that IP address.</td>
+  </tr>
+  <tr>
+    <td>An integer value greater than 0</td>
+    <td>&hellip; limited to accesses made by that <em>customer_id</em> or <em>admin_id</em>.</td>
+  </tr>
+</table>
+
+<h2>How to use it</h2>
+<p>Within any functions in non-class code that you want to debug (normal included or required files do not need this statement), include a statement of the form:<br/><br/>
+<code>
+global $zco_notifier; // include this once, prior to the first use
+$zco_notifier-&gt;notify('string and constant values'[, array_of_values]);
+</code>
+</p>
+<p>This will also aid you in your debugging of classes, so long as the class is defined as: <br/><br/><code>class <i>class_name</i> <strong>extends base</strong>;</code><br/><br/>
+When you want to see the internals of your class, use the form: <br/><br/><code>$this-&gt;notify('string and constant values'[, array_of_values]);</code><br/><br/>
+All the information will be present in the <b>notifier_trace.log</b> file, in the order that the statements were executed.</p>
+<p><strong>Notes:</strong></p>
+<ol>
+  <li>The notifier_trace.log file can get very big very quickly, so you need to delete it periodically during your debug. For Zen Cart installations of v1.5.0 and later, you can use the <a href="http://www.zen-cart.com/downloads.php?do=file&amp;id=1583" target="_blank">Display Logs</a> plugin to view and delete this file during your debug.</li>
+  <li>I would not recommend using this in a heavy-traffic live store, due to possible performance degradation.</li>
+</ol>
+
+<h2>Installation</h2>
+<p>Depending on your Zen Cart version, there is either one or no <span class="corefile">core-file</span> overwritten by this plugin.  You should <strong>always</strong> backup your cart&rsquo;s database and files prior to making any changes.</p>
+<ol>
+  <li>Create a backup of your Zen Cart's database and files.</li>
+  <li>If you currently have a version of <em>Zen Notifier Trace</em> prior to v2.0.0 installed, you'll need to remove two files from your Zen Cart before installing the updated version:<ol>
+    <li>/includes/auto_loaders/overrides/config.core.php</li>
+    <li>/includes/classes/class.base_trace.php</li>
+  </ol></li>
+  <li>Run the <strong>/zen_trace_install.sql</strong> file provided by this plugin.  Go to your admin's <em>Tools-&gt;Install SQL Patches</em>; from there you can either upload the .sql file or copy and paste the contents of the file.</li>
+  <li>If you are installing this plugin on a Zen Cart version prior to v1.5.2, copy the plugin's file /before_zc152<span class="corefile">/includes/classes/class.core.php</span> to the (currently empty) plugin directory /includes/classes.  This is the version of the file distributed with the Zen Cart v1.5.2-RC2 release.</li>
+  <li>Rename the YOUR_ADMIN directory to match the name of your Zen Cart admin directory and then copy the plugin's files to your Zen Cart:<ol>
+    <li>/includes/auto_loaders/config.notifier_trace.php</li>
+    <li><em><span class="corefile">/includes/classes/class.base.php</span></em> &mdash; if copied in the step above.</li>
+    <li>/includes/init_includes/init_notifier_trace.php</li>
+    <li>/YOUR_ADMIN/includes/auto_loaders/config.notifier_trace_admin.php</li>
+  </ol></li> 
+</ol>
+
+<h2>Un-install</h2>
+<p>Run the <strong>zen_trace_uninstall.sql</strong> file to remove the database entry, then delete any files you previously copied.</p>
+
+</body>
+</html>
